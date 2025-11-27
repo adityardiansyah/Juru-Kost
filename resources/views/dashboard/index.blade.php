@@ -136,49 +136,47 @@
         </div>
     </div>
 
-    @push('scripts')
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script>
-            // Revenue Chart
-            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
-            new Chart(revenueCtx, {
-                type: 'line',
-                data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
-                    datasets: [{
-                        label: 'Pendapatan',
-                        data: [18000000, 19000000, 17500000, 20000000, 21000000, 18000000],
-                        borderColor: 'rgb(34, 197, 94)',
-                        backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                    }, {
-                        label: 'Pengeluaran',
-                        data: [5000000, 5500000, 4800000, 6000000, 5200000, 5000000],
-                        borderColor: 'rgb(239, 68, 68)',
-                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                }
-            });
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Revenue Chart
+        const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+        new Chart(revenueCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
+                datasets: [{
+                    label: 'Pendapatan',
+                    data: [18000000, 19000000, 17500000, 20000000, 21000000, 18000000],
+                    borderColor: 'rgb(34, 197, 94)',
+                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                }, {
+                    label: 'Pengeluaran',
+                    data: [5000000, 5500000, 4800000, 6000000, 5200000, 5000000],
+                    borderColor: 'rgb(239, 68, 68)',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+            }
+        });
 
-            // Room Status Chart
-            const roomCtx = document.getElementById('roomStatusChart').getContext('2d');
-            new Chart(roomCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Terisi', 'Kosong', 'Maintenance'],
-                    datasets: [{
-                        data: [{{ $statistics['occupied_rooms'] }}, {{ $statistics['available_rooms'] }}, 0],
-                        backgroundColor: ['rgb(34, 197, 94)', 'rgb(59, 130, 246)', 'rgb(234, 179, 8)'],
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                }
-            });
-        </script>
-    @endpush
+        // Room Status Chart
+        const roomCtx = document.getElementById('roomStatusChart').getContext('2d');
+        new Chart(roomCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Terisi', 'Kosong', 'Maintenance'],
+                datasets: [{
+                    data: [{{ $statistics['occupied_rooms'] }}, {{ $statistics['available_rooms'] }}, 0],
+                    backgroundColor: ['rgb(34, 197, 94)', 'rgb(59, 130, 246)', 'rgb(234, 179, 8)'],
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+            }
+        });
+    </script>
 </x-app-layout>

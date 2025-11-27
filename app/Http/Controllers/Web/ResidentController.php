@@ -68,7 +68,11 @@ class ResidentController extends Controller
     public function show(Resident $resident)
     {
         $resident->load('currentRoom.room', 'documents', 'bills');
-        return view('residents.show', compact('resident'));
+        $availableRooms = Room::where('tenant_id', session('tenant_id'))
+            ->where('status', 'available')
+            ->get();
+
+        return view('residents.show', compact('resident', 'availableRooms'));
     }
 
     public function edit(Resident $resident)

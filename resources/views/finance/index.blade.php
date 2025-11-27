@@ -89,32 +89,30 @@
         </div>
     </div>
 
-    @push('scripts')
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script>
-            // Income Chart
-            new Chart(document.getElementById('incomeChart'), {
-                type: 'pie',
-                data: {
-                    labels: {!! json_encode($incomeCategories->pluck('name')) !!},
-                    datasets: [{
-                        data: {!! json_encode($incomeCategories->pluck('total')) !!},
-                        backgroundColor: ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444']
-                    }]
-                }
-            });
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Income Chart
+        new Chart(document.getElementById('incomeChart'), {
+            type: 'pie',
+            data: {
+                labels: {!! json_encode($incomeCategories->pluck('name')) !!},
+                datasets: [{
+                    data: {!! json_encode($incomeCategories->pluck('total')) !!},
+                    backgroundColor: ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444']
+                }]
+            }
+        });
 
-            // Expense Chart
-            new Chart(document.getElementById('expenseChart'), {
-                type: 'pie',
-                data: {
-                    labels: {!! json_encode($expenseCategories->pluck('name')) !!},
-                    datasets: [{
-                        data: {!! json_encode($expenseCategories->pluck('total')) !!},
-                        backgroundColor: ['#ef4444', '#f59e0b', '#8b5cf6', '#3b82f6', '#10b981']
-                    }]
-                }
-            });
-        </script>
-    @endpush
+        // Expense Chart
+        new Chart(document.getElementById('expenseChart'), {
+            type: 'pie',
+            data: {
+                labels: {!! json_encode($expenseCategories->pluck('name')) !!},
+                datasets: [{
+                    data: {!! json_encode($expenseCategories->pluck('total')) !!},
+                    backgroundColor: ['#ef4444', '#f59e0b', '#8b5cf6', '#3b82f6', '#10b981']
+                }]
+            }
+        });
+    </script>
 </x-app-layout>

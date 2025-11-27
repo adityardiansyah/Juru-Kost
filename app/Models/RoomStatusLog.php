@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class RoomStatusLog extends Model
 {
-    //
+    protected $guarded = [];
 }

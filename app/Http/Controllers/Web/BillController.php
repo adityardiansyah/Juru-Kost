@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Models\Bill;
+use App\Models\Resident;
 use App\Services\BillService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -42,6 +43,53 @@ class BillController extends Controller
         return view('bills.index', compact('bills', 'stats'));
     }
 
+    public function create()
+    {
+        $residents = Resident::where('tenant_id', session('tenant_id'))->where('status', 'active')->get();
+        return view('bills.create', compact('residents'));
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'resident_id' => 'required|exists:residents,id',
+            'bill_date' => 'required|date',
+            'due_date' => 'required|date|after_or_equal:bill_date',
+            'items' => 'required|array|min:1',
+            'items.*.description' => 'required|string',
+            'items.*.amount' => 'required|numeric|min:0',
+            'items.*.quantity' => 'required|integer|min:1',
+        ]);
+
+        $bill = Bill::create([
+            'tenant_id' => session('tenant_id'),
+            'resident_id' => $validated['resident_id'],
+            'bill_date' => $validated['bill_date'],
+            'due_date' => $validated['due_date'],
+            'total_amount' => 0,
+            'paid_amount' => 0,
+            'status' => 'unpaid',
+        ]);
+
+        // Add items
+        foreach ($validated['items'] as $item) {
+            $bill->items()->create([
+                'tenant_id' => session('tenant_id'),
+                'description' => $item['description'],
+                'amount' => $item['amount'],
+                'quantity' => $item['quantity'],
+                'subtotal' => $item['amount'] * $item['quantity'],
+            ]);
+        }
+
+        // Update total
+        $bill->total_amount = $bill->items->sum('subtotal');
+        $bill->save();
+
+        return redirect()->route('bills.index')
+            ->with('success', 'Tagihan berhasil dibuat!');
+    }
+
     public function show(Bill $bill)
     {
         $bill->load('resident', 'items', 'payments');
@@ -50,7 +98,8 @@ class BillController extends Controller
 
     public function showGenerate()
     {
-        return view('bills.generate');
+        $activeResidents = Resident::where('tenant_id', session('tenant_id'))->where('status', 'active')->get();
+        return view('bills.generate', compact('activeResidents'));
     }
 
     public function generate(Request $request)

@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-white leading-tight">
-            Edit Kamar: {{ $room->room_number }}
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            Edit Kamar {{ $room->room_number }}
         </h2>
     </x-slot>
 
@@ -45,34 +45,86 @@
                             <p class="text-red-500 text-xs italic mt-1">{{ $message }}</p>
                         @enderror
                     </div>
+
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-bold mb-2">Fasilitas</label>
                         <textarea name="facilities" rows="3"
                             class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">{{ old('facilities', $room->facilities) }}</textarea>
                     </div>
+
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-bold mb-2">Status *</label>
                         <select name="status"
                             class="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             required>
-                            <option value="available" {{ old('status', $room->status) == 'available' ? 'selected' : '' }}>Kosong
+                            <option value="available"
+                                {{ old('status', $room->status) == 'available' ? 'selected' : '' }}>Kosong</option>
+                            <option value="occupied"
+                                {{ old('status', $room->status) == 'occupied' ? 'selected' : '' }}>Terisi</option>
+                            <option value="booked" {{ old('status', $room->status) == 'booked' ? 'selected' : '' }}>
+                                Booking</option>
+                            <option value="maintenance"
+                                {{ old('status', $room->status) == 'maintenance' ? 'selected' : '' }}>Perbaikan
                             </option>
-                            <option value="occupied" {{ old('status', $room->status) == 'occupied' ? 'selected' : '' }}>Terisi
-                            </option>
-                            <option value="booked" {{ old('status', $room->status) == 'booked' ? 'selected' : '' }}>Booking</option>
-                            <option value="maintenance" {{ old('status', $room->status) == 'maintenance' ? 'selected' : '' }}>
-                                Perbaikan</option>
                         </select>
                     </div>
 
-                    <div class="flex justify-end">
+                    @if ($room->photos && count($room->photos) > 0)
+                        <div class="mb-4">
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Foto Saat Ini</label>
+                            <div class="grid grid-cols-4 gap-2" id="currentPhotos">
+                                @foreach ($room->photos as $index => $photo)
+                                    <div class="relative photo-item" data-photo="{{ $photo }}">
+                                        <img src="{{ asset('storage/' . $photo) }}" alt="Room Photo"
+                                            class="w-full h-24 object-cover rounded">
+                                        <button type="button" onclick="removePhoto('{{ $photo }}', this)"
+                                            class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-700">
+                                            ×
+                                        </button>
+                                    </div>
+                                @endforeach
+                            </div>
+                            <input type="hidden" name="keep_photos" id="keepPhotos"
+                                value="{{ json_encode($room->photos) }}">
+                        </div>
+                    @endif
+
+                    <div class="mb-6">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Upload Foto Baru (Opsional)</label>
+                        <input type="file" name="photos[]" multiple accept="image/*"
+                            class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                        <p class="text-gray-600 text-xs mt-1">Upload foto baru akan ditambahkan ke foto yang ada</p>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <a href="{{ route('rooms.show', $room) }}"
+                            class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                            Batal
+                        </a>
                         <button type="submit"
                             class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                            Simpan
+                            Simpan Perubahan
                         </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+
+    <script>
+        let keepPhotos = @json($room->photos ?? []);
+
+        function removePhoto(photo, button) {
+            if (confirm('Yakin ingin hapus foto ini?')) {
+                // Remove from array
+                keepPhotos = keepPhotos.filter(p => p !== photo);
+
+                // Update hidden input
+                document.getElementById('keepPhotos').value = JSON.stringify(keepPhotos);
+
+                // Remove from DOM
+                button.closest('.photo-item').remove();
+            }
+        }
+    </script>
 </x-app-layout>

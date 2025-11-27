@@ -165,8 +165,12 @@
                                 class="block w-full bg-blue-500 hover:bg-blue-700 text-white text-center font-bold py-2 px-4 rounded">
                                 Buat Tagihan
                             </a>
-                            <a href="{{ route('maintenance-requests.create', ['resident_id' => $resident->id]) }}"
+                            <button onclick="document.getElementById('moveRoomModal').classList.remove('hidden')"
                                 class="block w-full bg-yellow-500 hover:bg-yellow-700 text-white text-center font-bold py-2 px-4 rounded">
+                                Pindah Kamar
+                            </button>
+                            <a href="{{ route('maintenance-requests.create', ['resident_id' => $resident->id]) }}"
+                                class="block w-full bg-orange-500 hover:bg-orange-700 text-white text-center font-bold py-2 px-4 rounded">
                                 Lapor Kerusakan
                             </a>
                             <button onclick="alert('Fitur WhatsApp coming soon!')"
@@ -180,39 +184,85 @@
         </div>
     </div>
 
-    {{-- Upload Modal --}}
-    <div id="uploadModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+    {{-- Move Room Modal --}}
+    <div id="moveRoomModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-2/3 lg:w-1/2 shadow-lg rounded-md bg-white">
             <div class="mt-3">
-                <h3 class="text-lg font-bold mb-4">Upload Dokumen</h3>
-                <form action="{{ route('residents.upload-document', $resident) }}" method="POST"
-                    enctype="multipart/form-data">
+                <h3 class="text-lg font-bold mb-4">Pindah Kamar</h3>
+
+                @if ($resident->currentRoom)
+                    <div class="bg-blue-50 border border-blue-200 rounded p-3 mb-4">
+                        <p class="text-sm text-blue-800">
+                            <strong>Kamar Saat Ini:</strong> Kamar {{ $resident->currentRoom->room->room_number }} -
+                            Rp {{ number_format($resident->currentRoom->monthly_price, 0, ',', '.') }}/bulan
+                        </p>
+                    </div>
+                @endif
+
+                <form action="{{ route('residents.move-room', $resident) }}" method="POST">
                     @csrf
+
                     <div class="mb-4">
-                        <label class="block text-sm font-bold mb-2">Tipe Dokumen</label>
-                        <select name="document_type" class="w-full border rounded py-2 px-3" required>
-                            <option value="ktp">KTP</option>
-                            <option value="contract">Kontrak</option>
-                            <option value="other">Lainnya</option>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Kamar Baru *</label>
+                        <select name="new_room_id" id="new_room_id" required
+                            class="shadow border rounded w-full py-2 px-3 text-gray-700">
+                            <option value="">-- Pilih Kamar Baru --</option>
+                            @foreach ($availableRooms as $room)
+                                <option value="{{ $room->id }}" data-price="{{ $room->price }}">
+                                    Kamar {{ $room->room_number }} - Rp
+                                    {{ number_format($room->price, 0, ',', '.') }}/bulan
+                                </option>
+                            @endforeach
                         </select>
                     </div>
-                    <div class="mb-4">
-                        <label class="block text-sm font-bold mb-2">File</label>
-                        <input type="file" name="file" accept="image/*,application/pdf"
-                            class="w-full border rounded py-2 px-3" required>
+
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Tanggal Pindah *</label>
+                            <input type="date" name="start_date" value="{{ date('Y-m-d') }}" required
+                                class="shadow border rounded w-full py-2 px-3 text-gray-700">
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 text-sm font-bold mb-2">Harga Sewa/Bulan *</label>
+                            <input type="number" name="monthly_price" id="new_monthly_price" required
+                                min="0" class="shadow border rounded w-full py-2 px-3 text-gray-700">
+                        </div>
                     </div>
+
+                    <div class="bg-yellow-50 border border-yellow-200 rounded p-3 mb-4">
+                        <p class="text-sm text-yellow-800">
+                            <strong>Perhatian:</strong> Kamar lama akan diubah statusnya menjadi "Kosong" dan kamar baru
+                            akan menjadi "Terisi".
+                        </p>
+                    </div>
+
                     <div class="flex justify-end gap-2">
-                        <button type="button" onclick="document.getElementById('uploadModal').classList.add('hidden')"
+                        <button type="button"
+                            onclick="document.getElementById('moveRoomModal').classList.add('hidden')"
                             class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
                             Batal
                         </button>
                         <button type="submit"
-                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                            Upload
+                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                            onclick="return confirm('Yakin ingin pindahkan ke kamar baru?')">
+                            Pindah Kamar
                         </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+
+    @push('scripts')
+        <script>
+            document.getElementById('new_room_id').addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                const price = selectedOption.getAttribute('data-price');
+                if (price) {
+                    document.getElementById('new_monthly_price').value = price;
+                }
+            });
+        </script>
+    @endpush
 </x-app-layout>
