@@ -27,23 +27,56 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'is_superuser' => 'boolean',
     ];
 
     public function tenants(): BelongsToMany
     {
         return $this->belongsToMany(Tenant::class, 'tenant_user')
-            ->withPivot('role')
+            ->withPivot('role_id')
             ->withTimestamps();
     }
 
-    public function hasRole(string $role, $tenantId = null): bool
+    public function roles(): BelongsToMany
     {
+        return $this->belongsToMany(Role::class, 'tenant_user')
+            ->withPivot('tenant_id')
+            ->withTimestamps();
+    }
+
+    public function hasRole(string $roleName, $tenantId = null): bool
+    {
+        if ($this->is_superuser) {
+            return true;
+        }
+
         $tenantId = $tenantId ?? session('tenant_id');
-        
-        return $this->tenants()
+
+        return $this->roles()
             ->wherePivot('tenant_id', $tenantId)
-            ->wherePivot('role', $role)
+            ->where('name', $roleName)
             ->exists();
+    }
+
+    public function hasPermission(string $permissionName, $tenantId = null): bool
+    {
+        if ($this->is_superuser) {
+            return true;
+        }
+
+        $tenantId = $tenantId ?? session('tenant_id');
+
+        // Get user's role for this tenant
+        $role = $this->roles()
+            ->wherePivot('tenant_id', $tenantId)
+            ->first();
+
+        if (!$role) {
+            return false;
+        }
+
+        // Check if role has permission
+        return $role->permissions()->where('name', $permissionName)->exists();
     }
 
     public function isOwner($tenantId = null): bool

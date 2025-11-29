@@ -2,13 +2,19 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoomTypeController;
+use App\Http\Controllers\Web\AssetController;
 use App\Http\Controllers\Web\BillController;
 use App\Http\Controllers\Web\DashboardController;
+use App\Http\Controllers\Web\ExpenseCategoryController;
 use App\Http\Controllers\Web\FinanceController;
+use App\Http\Controllers\Web\IncomeCategoryController;
+use App\Http\Controllers\Web\InventoryController;
 use App\Http\Controllers\Web\PaymentController;
 use App\Http\Controllers\Web\ResidentController;
 use App\Http\Controllers\Web\RoomController;
+use App\Http\Controllers\Web\RoleController;
 use App\Http\Controllers\Web\TenantSelectionController;
+use App\Http\Controllers\Web\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -23,6 +29,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // Admin / Superuser Routes
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::resource('roles', RoleController::class);
+        Route::resource('users', UserController::class);
+    });
 });
 
 Route::middleware('tenant.ensure')->group(function () {
@@ -76,8 +88,22 @@ Route::middleware(['auth', 'tenant.set'])->group(function () {
             Route::get('/', [FinanceController::class, 'index'])->name('index');
             Route::get('/incomes', [FinanceController::class, 'incomes'])->name('incomes.index');
             Route::post('/incomes', [FinanceController::class, 'storeIncome'])->name('incomes.store');
+            Route::delete('/incomes/{income}', [FinanceController::class, 'destroyIncome'])->name('incomes.destroy');
+
             Route::get('/expenses', [FinanceController::class, 'expenses'])->name('expenses.index');
             Route::post('/expenses', [FinanceController::class, 'storeExpense'])->name('expenses.store');
+            Route::delete('/expenses/{expense}', [FinanceController::class, 'destroyExpense'])->name('expenses.destroy');
+
+            Route::get('/income-categories', [IncomeCategoryController::class, 'index'])->name('income-categories.index');
+            Route::post('/income-categories', [IncomeCategoryController::class, 'store'])->name('income-categories.store');
+            Route::put('/income-categories/{incomeCategory}', [IncomeCategoryController::class, 'update'])->name('income-categories.update');
+            Route::delete('/income-categories/{incomeCategory}', [IncomeCategoryController::class, 'destroy'])->name('income-categories.destroy');
+
+            Route::get('/expense-categories', [ExpenseCategoryController::class, 'index'])->name('expense-categories.index');
+            Route::post('/expense-categories', [ExpenseCategoryController::class, 'store'])->name('expense-categories.store');
+            Route::put('/expense-categories/{expenseCategory}', [ExpenseCategoryController::class, 'update'])->name('expense-categories.update');
+            Route::delete('/expense-categories/{expenseCategory}', [ExpenseCategoryController::class, 'destroy'])->name('expense-categories.destroy');
+
             Route::get('/hpp', [FinanceController::class, 'hpp'])->name('hpp');
             Route::get('/export', [FinanceController::class, 'export'])->name('export');
         });

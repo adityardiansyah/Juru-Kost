@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Room;
 use App\Models\RoomType;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class RoomController extends Controller
 {
@@ -79,7 +80,36 @@ class RoomController extends Controller
             'price' => 'required|numeric|min:0',
             'facilities' => 'nullable|string',
             'status' => 'required|in:available,occupied,booked,maintenance',
+            'photos' => 'nullable|array',
+            'photos.*' => 'image|mimes:jpeg,png,jpg|max:2048',
+            'keep_photos' => 'nullable|string',
         ]);
+
+        // Handle photos
+        $currentPhotos = $room->photos ?? [];
+        $keepPhotos = [];
+
+        if (isset($validated['keep_photos'])) {
+            $keepPhotos = json_decode($validated['keep_photos'], true) ?? [];
+        }
+
+        // Find photos to delete (in current but not in keep)
+        $photosToDelete = array_diff($currentPhotos, $keepPhotos);
+        foreach ($photosToDelete as $photo) {
+            Storage::disk('public')->delete($photo);
+        }
+
+        // Handle new uploads
+        $newPhotos = [];
+        if ($request->hasFile('photos')) {
+            foreach ($request->file('photos') as $photo) {
+                $newPhotos[] = $photo->store('rooms', 'public');
+            }
+        }
+
+        // Merge kept photos and new photos
+        $validated['photos'] = array_merge($keepPhotos, $newPhotos);
+        unset($validated['keep_photos']);
 
         // Log status change
         if ($room->status !== $validated['status']) {

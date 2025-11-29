@@ -16,8 +16,13 @@ class SetTenant
 
             // Verify user has access to this tenant
             if (auth()->check()) {
-                $hasAccess = auth()->user()
-                    ->tenants()
+                $user = auth()->user();
+
+                if ($user->is_superuser) {
+                    return $next($request);
+                }
+
+                $hasAccess = $user->tenants()
                     ->where('tenants.id', $tenantId)
                     ->exists();
 

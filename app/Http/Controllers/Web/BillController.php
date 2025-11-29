@@ -121,4 +121,73 @@ class BillController extends Controller
         $pdf = Pdf::loadView('bills.pdf', compact('bill'));
         return $pdf->download('tagihan-' . $bill->bill_number . '.pdf');
     }
+
+    public function edit(Bill $bill)
+    {
+        if ($bill->paid_amount > 0) {
+            return redirect()->route('bills.show', $bill)
+                ->with('error', 'Tagihan yang sudah dibayar (sebagian/lunas) tidak dapat diedit.');
+        }
+
+        $bill->load('items');
+        $residents = Resident::where('tenant_id', session('tenant_id'))->where('status', 'active')->get();
+        return view('bills.edit', compact('bill', 'residents'));
+    }
+
+    public function update(Request $request, Bill $bill)
+    {
+        if ($bill->paid_amount > 0) {
+            return redirect()->route('bills.show', $bill)
+                ->with('error', 'Tagihan yang sudah dibayar (sebagian/lunas) tidak dapat diedit.');
+        }
+
+        $validated = $request->validate([
+            'resident_id' => 'required|exists:residents,id',
+            'bill_date' => 'required|date',
+            'due_date' => 'required|date|after_or_equal:bill_date',
+            'items' => 'required|array|min:1',
+            'items.*.description' => 'required|string',
+            'items.*.amount' => 'required|numeric|min:0',
+            'items.*.quantity' => 'required|integer|min:1',
+        ]);
+
+        $bill->update([
+            'resident_id' => $validated['resident_id'],
+            'bill_date' => $validated['bill_date'],
+            'due_date' => $validated['due_date'],
+        ]);
+
+        // Replace items
+        $bill->items()->delete();
+        foreach ($validated['items'] as $item) {
+            $bill->items()->create([
+                'tenant_id' => session('tenant_id'),
+                'description' => $item['description'],
+                'amount' => $item['amount'],
+                'quantity' => $item['quantity'],
+                'subtotal' => $item['amount'] * $item['quantity'],
+            ]);
+        }
+
+        // Update total
+        $bill->total_amount = $bill->items->sum('subtotal');
+        $bill->save();
+
+        return redirect()->route('bills.index')
+            ->with('success', 'Tagihan berhasil diupdate!');
+    }
+
+    public function destroy(Bill $bill)
+    {
+        if ($bill->paid_amount > 0) {
+            return redirect()->route('bills.index')
+                ->with('error', 'Tagihan yang sudah dibayar (sebagian/lunas) tidak dapat dihapus.');
+        }
+
+        $bill->items()->delete();
+        $bill->delete();
+
+        return redirect()->route('bills.index')
+            ->with('success', 'Tagihan berhasil dihapus!');
+    }
 }

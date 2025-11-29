@@ -123,7 +123,19 @@
                                             class="text-blue-600 hover:text-blue-900 mr-2">Detail</a>
                                         @if ($bill->status != 'paid')
                                             <a href="{{ route('payments.create', ['bill_id' => $bill->id]) }}"
-                                                class="text-green-600 hover:text-green-900">Bayar</a>
+                                                class="text-green-600 hover:text-green-900 mr-2">Bayar</a>
+                                        @endif
+                                        @if ($bill->paid_amount == 0)
+                                            <a href="{{ route('bills.edit', $bill) }}"
+                                                class="text-yellow-600 hover:text-yellow-900 mr-2">Edit</a>
+                                            <form action="{{ route('bills.destroy', $bill) }}" method="POST"
+                                                class="inline-block"
+                                                onsubmit="return confirm('Yakin ingin menghapus tagihan ini?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit"
+                                                    class="text-red-600 hover:text-red-900">Hapus</button>
+                                            </form>
                                         @endif
                                     </td>
                                 </tr>

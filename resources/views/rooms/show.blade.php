@@ -118,8 +118,13 @@
                         </thead>
                         <tbody>
                             @forelse($room->assets as $asset)
-                                <tr class="border-b">
-                                    <td class="px-4 py-2">{{ $asset->name }}</td>
+                                <tr class="border-b hover:bg-gray-50">
+                                    <td class="px-4 py-2">
+                                        <a href="{{ route('assets.show', $asset) }}"
+                                            class="text-blue-600 hover:text-blue-900 font-medium">
+                                            {{ $asset->name }}
+                                        </a>
+                                    </td>
                                     <td class="px-4 py-2">{{ $asset->code }}</td>
                                     <td class="px-4 py-2 text-right">Rp
                                         {{ number_format($asset->purchase_price, 0, ',', '.') }}</td>
@@ -128,9 +133,10 @@
                                     <td class="px-4 py-2 text-center">
                                         <span
                                             class="px-2 py-1 text-xs rounded
-                                            {{ $asset->condition == 'excellent' ? 'bg-green-100 text-green-800' : '' }}
-                                            {{ $asset->condition == 'good' ? 'bg-blue-100 text-blue-800' : '' }}
-                                            {{ $asset->condition == 'fair' ? 'bg-yellow-100 text-yellow-800' : '' }}">
+                                            {{ $asset->condition == 'good' ? 'bg-green-100 text-green-800' : '' }}
+                                            {{ $asset->condition == 'fair' ? 'bg-yellow-100 text-yellow-800' : '' }}
+                                            {{ $asset->condition == 'poor' ? 'bg-orange-100 text-orange-800' : '' }}
+                                            {{ $asset->condition == 'broken' ? 'bg-red-100 text-red-800' : '' }}">
                                             {{ ucfirst($asset->condition) }}
                                         </span>
                                     </td>

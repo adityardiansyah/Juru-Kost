@@ -64,11 +64,18 @@
                             <div class="py-1">
                                 <a href="{{ route('finance.index') }}"
                                     class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Laporan Keuangan</a>
-                                {{-- <a href="{{ route('incomes.index') }}"
+                                <a href="{{ route('finance.incomes.index') }}"
                                     class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Pendapatan</a>
-                                <a href="{{ route('expenses.index') }}"
+                                <a href="{{ route('finance.expenses.index') }}"
                                     class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Pengeluaran</a>
-                                <a href="{{ route('finance.hpp') }}"
+                                <div class="border-t my-1"></div>
+                                <a href="{{ route('finance.income-categories.index') }}"
+                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Kategori
+                                    Pemasukan</a>
+                                <a href="{{ route('finance.expense-categories.index') }}"
+                                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Kategori
+                                    Pengeluaran</a>
+                                {{-- <a href="{{ route('finance.hpp') }}"
                                     class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">HPP & BEP</a> --}}
                             </div>
                         </div>
