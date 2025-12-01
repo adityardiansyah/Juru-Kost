@@ -14,12 +14,18 @@ class InventoryController extends Controller
             $query->where('name', 'like', "%{$search}%")
                 ->orWhere('sku', 'like', "%{$search}%");
         })
+            ->when($request->low_stock, function ($query) {
+                $query->whereColumn('quantity', '<=', 'min_stock');
+            })
+            ->orderBy('name')
             ->paginate(20);
 
-        return response()->json([
-            'success' => true,
-            'data' => $inventories,
-        ]);
+        return view('inventories.index', compact('inventories'));
+    }
+
+    public function create()
+    {
+        return view('inventories.create');
     }
 
     public function store(Request $request)
@@ -41,47 +47,45 @@ class InventoryController extends Controller
             'unit_price' => $validated['unit_price'],
         ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Inventory created successfully',
-            'data' => $inventory,
-        ], 201);
+        return redirect()->route('inventories.index')
+            ->with('success', 'Inventori berhasil ditambahkan!');
     }
 
     public function show(Inventory $inventory)
     {
-        return response()->json([
-            'success' => true,
-            'data' => $inventory->load('logs.user'),
-        ]);
+        $inventory->load(['logs' => function ($query) {
+            $query->with('user')->orderBy('created_at', 'desc');
+        }]);
+
+        return view('inventories.show', compact('inventory'));
+    }
+
+    public function edit(Inventory $inventory)
+    {
+        return view('inventories.edit', compact('inventory'));
     }
 
     public function update(Request $request, Inventory $inventory)
     {
         $validated = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'min_stock' => 'sometimes|required|integer|min:0',
-            'unit' => 'sometimes|required|string|max:50',
-            'unit_price' => 'sometimes|required|numeric|min:0',
+            'name' => 'required|string|max:255',
+            'min_stock' => 'required|integer|min:0',
+            'unit' => 'required|string|max:50',
+            'unit_price' => 'required|numeric|min:0',
         ]);
 
         $inventory->update($validated);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Inventory updated successfully',
-            'data' => $inventory,
-        ]);
+        return redirect()->route('inventories.show', $inventory)
+            ->with('success', 'Inventori berhasil diupdate!');
     }
 
     public function destroy(Inventory $inventory)
     {
         $inventory->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Inventory deleted successfully',
-        ]);
+        return redirect()->route('inventories.index')
+            ->with('success', 'Inventori berhasil dihapus!');
     }
 
     public function stockIn(Request $request, Inventory $inventory)
@@ -97,11 +101,8 @@ class InventoryController extends Controller
             auth()->id()
         );
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Stock added successfully',
-            'data' => $inventory->fresh(),
-        ]);
+        return redirect()->route('inventories.show', $inventory)
+            ->with('success', 'Stok berhasil ditambahkan!');
     }
 
     public function stockOut(Request $request, Inventory $inventory)
@@ -112,10 +113,8 @@ class InventoryController extends Controller
         ]);
 
         if ($validated['quantity'] > $inventory->quantity) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Insufficient stock',
-            ], 422);
+            return redirect()->back()
+                ->with('error', 'Stok tidak mencukupi!');
         }
 
         $inventory->reduceStock(
@@ -124,23 +123,7 @@ class InventoryController extends Controller
             auth()->id()
         );
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Stock reduced successfully',
-            'data' => $inventory->fresh(),
-        ]);
-    }
-
-    public function lowStockAlert()
-    {
-        $lowStock = Inventory::where('tenant_id', session('tenant_id'))
-            ->whereColumn('quantity', '<=', 'min_stock')
-            ->get();
-
-        return response()->json([
-            'success' => true,
-            'data' => $lowStock,
-            'count' => $lowStock->count(),
-        ]);
+        return redirect()->route('inventories.show', $inventory)
+            ->with('success', 'Stok berhasil dikurangi!');
     }
 }

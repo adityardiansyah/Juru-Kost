@@ -24,14 +24,21 @@ class TenantSelectionController extends Controller
     /**
      * Switch to selected tenant
      */
-    public function switch(Request $request)
+    /**
+     * Switch to selected tenant
+     */
+    public function switch(Request $request, $tenantId = null)
     {
-        $validated = $request->validate([
-            'tenant_id' => 'required|exists:tenants,id',
-        ]);
+        // If tenant ID is passed in route (GET/POST from dropdown), use it
+        // Otherwise look for it in request body (POST from form)
+        $id = $tenantId ?? $request->input('tenant_id');
+
+        if (!$id) {
+            return back()->with('error', 'Tenant tidak valid.');
+        }
 
         // Verify user has access to this tenant
-        $tenant = auth()->user()->tenants()->find($validated['tenant_id']);
+        $tenant = auth()->user()->tenants()->find($id);
 
         if (!$tenant) {
             return back()->with('error', 'Anda tidak memiliki akses ke kost ini.');

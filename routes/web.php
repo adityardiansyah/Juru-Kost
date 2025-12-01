@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Web\TenantController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoomTypeController;
 use App\Http\Controllers\Web\AssetController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\Web\ExpenseCategoryController;
 use App\Http\Controllers\Web\FinanceController;
 use App\Http\Controllers\Web\IncomeCategoryController;
 use App\Http\Controllers\Web\InventoryController;
+use App\Http\Controllers\Web\MenuController;
 use App\Http\Controllers\Web\PaymentController;
 use App\Http\Controllers\Web\ResidentController;
 use App\Http\Controllers\Web\RoomController;
@@ -34,13 +36,16 @@ Route::middleware('auth')->group(function () {
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('roles', RoleController::class);
         Route::resource('users', UserController::class);
+        Route::resource('menus', MenuController::class);
+        Route::get('menus/{menu}/assign-roles', [MenuController::class, 'assignRoles'])->name('menus.assign-roles');
+        Route::post('menus/{menu}/assign-roles', [MenuController::class, 'updateRoles'])->name('menus.update-roles');
     });
 });
 
 Route::middleware('tenant.ensure')->group(function () {
-    Route::get('/tenant/{tenant}', [TenantController::class, 'show'])->name('tenant.show');
-    Route::get('/tenant/{tenant}/edit', [TenantController::class, 'edit'])->name('tenant.edit');
-    Route::put('/tenant/{tenant}', [TenantController::class, 'update'])->name('tenant.update');
+    // Route::get('/tenant/{tenant}', [TenantController::class, 'show'])->name('tenant.show');
+    // Route::get('/tenant/{tenant}/edit', [TenantController::class, 'edit'])->name('tenant.edit');
+    // Route::put('/tenant/{tenant}', [TenantController::class, 'update'])->name('tenant.update');
 });
 
 require __DIR__ . '/auth.php';
@@ -49,7 +54,7 @@ Route::middleware(['auth', 'tenant.set'])->group(function () {
 
     // Tenant selection
     Route::get('/select-tenant', [TenantSelectionController::class, 'index'])->name('tenant.select');
-    Route::post('/select-tenant', [TenantSelectionController::class, 'switch'])->name('tenant.switch');
+    Route::post('/select-tenant/{tenant}', [TenantSelectionController::class, 'switch'])->name('tenant.switch');
     Route::get('/tenant/create', [TenantSelectionController::class, 'create'])->name('tenant.create');
     Route::post('/tenant', [TenantSelectionController::class, 'store'])->name('tenant.store');
 

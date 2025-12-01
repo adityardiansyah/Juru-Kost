@@ -5,7 +5,7 @@
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}">
-                        <span class="text-xl font-bold text-blue-600">🏠 Kost Management</span>
+                        <span class="text-xl font-bold text-blue-600">🏠 JuruKost</span>
                     </a>
                 </div>
 

@@ -1,166 +1,153 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Detail Kost: {{ $tenant->name }}
+            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                {{ __('Detail Kost') }}: {{ $tenant->name }}
             </h2>
-            <div class="flex gap-2">
-                <a href="{{ route('tenant.edit', $tenant) }}"
-                    class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                    Edit
+            @if(auth()->user()->tenants()->wherePivot('tenant_id', $tenant->id)->wherePivot('role', 'owner')->exists())
+                <a href="{{ route('tenant.edit', $tenant) }}" class="px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:ring ring-indigo-300 disabled:opacity-25 transition ease-in-out duration-150">
+                    {{ __('Edit Kost') }}
                 </a>
-            </div>
+            @endif
         </div>
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-                {{-- Main Info --}}
-                <div class="lg:col-span-2 space-y-6">
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                        <h3 class="text-lg font-bold mb-4">Informasi Kost</h3>
-
-                        <div class="space-y-4">
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="text-sm text-gray-600">Nama Kost</label>
-                                    <p class="font-semibold">{{ $tenant->name }}</p>
-                                </div>
-                                <div>
-                                    <label class="text-sm text-gray-600">Slug</label>
-                                    <p class="font-semibold text-blue-600">{{ $tenant->slug }}</p>
-                                </div>
-                            </div>
-
-                            @if ($tenant->description)
-                                <div>
-                                    <label class="text-sm text-gray-600">Deskripsi</label>
-                                    <p class="text-gray-800">{{ $tenant->description }}</p>
-                                </div>
-                            @endif
-
-                            @if ($tenant->address)
-                                <div>
-                                    <label class="text-sm text-gray-600">Alamat</label>
-                                    <p class="text-gray-800">{{ $tenant->address }}</p>
-                                </div>
-                            @endif
-
-                            <div class="grid grid-cols-2 gap-4">
-                                @if ($tenant->phone)
-                                    <div>
-                                        <label class="text-sm text-gray-600">Telepon</label>
-                                        <p class="font-semibold">{{ $tenant->phone }}</p>
-                                    </div>
-                                @endif
-
-                                @if ($tenant->email)
-                                    <div>
-                                        <label class="text-sm text-gray-600">Email</label>
-                                        <p class="font-semibold">{{ $tenant->email }}</p>
-                                    </div>
-                                @endif
-                            </div>
-
-                            <div>
-                                <label class="text-sm text-gray-600">Status</label>
-                                <div>
-                                    <span
-                                        class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full {{ $tenant->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                        {{ $tenant->is_active ? 'Aktif' : 'Tidak Aktif' }}
-                                    </span>
-                                </div>
-                            </div>
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+            
+            <!-- Statistics Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Total Rooms -->
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 mr-4">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                            </svg>
                         </div>
-                    </div>
-
-                    {{-- Users/Team --}}
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-bold">Tim Pengelola</h3>
-                            <button
-                                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm">
-                                + Tambah User
-                            </button>
-                        </div>
-
-                        <div class="space-y-3">
-                            @foreach ($tenant->users as $user)
-                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded">
-                                    <div class="flex items-center">
-                                        <div
-                                            class="flex-shrink-0 h-10 w-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
-                                            {{ substr($user->name, 0, 1) }}
-                                        </div>
-                                        <div class="ml-3">
-                                            <p class="font-semibold">{{ $user->name }}</p>
-                                            <p class="text-sm text-gray-600">{{ $user->email }}</p>
-                                        </div>
-                                    </div>
-                                    <span
-                                        class="px-3 py-1 text-xs font-semibold rounded-full 
-                                    {{ $user->pivot->role == 'owner' ? 'bg-purple-100 text-purple-800' : '' }}
-                                    {{ $user->pivot->role == 'admin' ? 'bg-blue-100 text-blue-800' : '' }}
-                                    {{ $user->pivot->role == 'accountant' ? 'bg-green-100 text-green-800' : '' }}">
-                                        {{ ucfirst($user->pivot->role) }}
-                                    </span>
-                                </div>
-                            @endforeach
+                        <div>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Kamar</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $stats['total_rooms'] }}</p>
                         </div>
                     </div>
                 </div>
 
-                {{-- Sidebar Stats --}}
-                <div class="space-y-6">
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                        <h3 class="text-lg font-bold mb-4">Statistik</h3>
-
-                        <div class="space-y-4">
-                            <div class="border-b pb-3">
-                                <label class="text-sm text-gray-600">Total Kamar</label>
-                                <p class="text-2xl font-bold text-blue-600">{{ $stats['total_rooms'] ?? 0 }}</p>
-                            </div>
-                            <div class="border-b pb-3">
-                                <label class="text-sm text-gray-600">Penghuni Aktif</label>
-                                <p class="text-2xl font-bold text-green-600">{{ $stats['active_residents'] ?? 0 }}</p>
-                            </div>
-                            <div class="border-b pb-3">
-                                <label class="text-sm text-gray-600">Occupancy Rate</label>
-                                <p class="text-2xl font-bold text-purple-600">{{ $stats['occupancy_rate'] ?? 0 }}%</p>
-                            </div>
-                            <div>
-                                <label class="text-sm text-gray-600">Tagihan Tertunggak</label>
-                                <p class="text-2xl font-bold text-red-600">{{ $stats['unpaid_bills'] ?? 0 }}</p>
-                            </div>
+                <!-- Active Residents -->
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400 mr-4">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Penghuni Aktif</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $stats['active_residents'] }}</p>
                         </div>
                     </div>
+                </div>
 
-                    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                        <h3 class="text-lg font-bold mb-4">Quick Actions</h3>
+                <!-- Occupancy Rate -->
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-purple-100 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 mr-4">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Okupansi</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $stats['occupancy_rate'] }}%</p>
+                        </div>
+                    </div>
+                </div>
 
-                        <div class="space-y-2">
-                            <a href="{{ route('rooms.index') }}"
-                                class="block w-full bg-blue-500 hover:bg-blue-700 text-white text-center font-bold py-2 px-4 rounded">
-                                Kelola Kamar
-                            </a>
-                            <a href="{{ route('residents.index') }}"
-                                class="block w-full bg-green-500 hover:bg-green-700 text-white text-center font-bold py-2 px-4 rounded">
-                                Kelola Penghuni
-                            </a>
-                            <a href="{{ route('bills.generate') }}"
-                                class="block w-full bg-yellow-500 hover:bg-yellow-700 text-white text-center font-bold py-2 px-4 rounded">
-                                Generate Tagihan
-                            </a>
-                            <a href="{{ route('finance.index') }}"
-                                class="block w-full bg-purple-500 hover:bg-purple-700 text-white text-center font-bold py-2 px-4 rounded">
-                                Laporan Keuangan
-                            </a>
+                <!-- Unpaid Bills -->
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 rounded-full bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 mr-4">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Tagihan Belum Lunas</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ $stats['unpaid_bills'] }}</p>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Tenant Details -->
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 dark:text-gray-100">
+                    <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100 mb-4">Informasi Kost</h3>
+                    
+                    <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
+                        <div class="sm:col-span-1">
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Nama Kost</dt>
+                            <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ $tenant->name }}</dd>
+                        </div>
+                        <div class="sm:col-span-1">
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Slug</dt>
+                            <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ $tenant->slug }}</dd>
+                        </div>
+                        <div class="sm:col-span-1">
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Email</dt>
+                            <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ $tenant->email ?? '-' }}</dd>
+                        </div>
+                        <div class="sm:col-span-1">
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">No. Telepon</dt>
+                            <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ $tenant->phone ?? '-' }}</dd>
+                        </div>
+                        <div class="sm:col-span-2">
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Alamat</dt>
+                            <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ $tenant->address ?? '-' }}</dd>
+                        </div>
+                        <div class="sm:col-span-2">
+                            <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Deskripsi</dt>
+                            <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100">{{ $tenant->description ?? '-' }}</dd>
+                        </div>
+                    </dl>
+                </div>
+            </div>
+
+            <!-- Users List -->
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 dark:text-gray-100">
+                    <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100 mb-4">Pengelola</h3>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <thead class="bg-gray-50 dark:bg-gray-700">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Nama</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Email</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Role</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                @foreach($tenant->users as $user)
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
+                                            {{ $user->name }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                            {{ $user->email }}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $user->pivot->role === 'owner' ? 'bg-purple-100 text-purple-800' : 'bg-green-100 text-green-800' }}">
+                                                {{ ucfirst($user->pivot->role) }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </x-app-layout>
