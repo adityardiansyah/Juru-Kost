@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
                 Detail Penghuni: {{ $resident->name }}
             </h2>
             <div class="flex gap-2">
@@ -233,7 +233,7 @@
                     <div class="bg-yellow-50 border border-yellow-200 rounded p-3 mb-4">
                         <p class="text-sm text-yellow-800">
                             <strong>Perhatian:</strong> Kamar lama akan diubah statusnya menjadi "Kosong" dan kamar baru
-                            akan menjadi "Terisi".
+                            akan menjadi "occupied".
                         </p>
                     </div>
 

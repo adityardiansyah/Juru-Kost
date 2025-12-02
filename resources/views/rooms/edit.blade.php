@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             Edit Kamar {{ $room->room_number }}
         </h2>
     </x-slot>
@@ -60,7 +60,8 @@
                             <option value="available"
                                 {{ old('status', $room->status) == 'available' ? 'selected' : '' }}>Kosong</option>
                             <option value="occupied"
-                                {{ old('status', $room->status) == 'occupied' ? 'selected' : '' }}>Terisi</option>
+                                {{ old('status', $room->status) == 'occupied' ? 'selected' : '' }}>
+                                Terisi</option>
                             <option value="booked" {{ old('status', $room->status) == 'booked' ? 'selected' : '' }}>
                                 Booking</option>
                             <option value="maintenance"

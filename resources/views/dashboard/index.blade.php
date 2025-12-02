@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             Dashboard - {{ auth()->user()->tenants()->find(session('tenant_id'))->name }}
         </h2>
     </x-slot>
@@ -167,7 +167,7 @@
         new Chart(roomCtx, {
             type: 'doughnut',
             data: {
-                labels: ['Terisi', 'Kosong', 'Maintenance'],
+                labels: ['occupied', 'Kosong', 'Maintenance'],
                 datasets: [{
                     data: [{{ $statistics['occupied_rooms'] }}, {{ $statistics['available_rooms'] }}, 0],
                     backgroundColor: ['rgb(34, 197, 94)', 'rgb(59, 130, 246)', 'rgb(234, 179, 8)'],

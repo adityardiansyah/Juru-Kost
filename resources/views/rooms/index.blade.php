@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
                 Manajemen Kamar
             </h2>
             <a href="{{ route('rooms.create') }}"
@@ -21,7 +21,8 @@
                         <option value="">Semua Status</option>
                         <option value="available" {{ request('status') == 'available' ? 'selected' : '' }}>Kosong
                         </option>
-                        <option value="occupied" {{ request('status') == 'occupied' ? 'selected' : '' }}>Terisi</option>
+                        <option value="occupied" {{ request('status') == 'occupied' ? 'selected' : '' }}>occupied
+                        </option>
                         <option value="booked" {{ request('status') == 'booked' ? 'selected' : '' }}>Booking</option>
                         <option value="maintenance" {{ request('status') == 'maintenance' ? 'selected' : '' }}>Perbaikan
                         </option>

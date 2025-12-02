@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             Tambah Penghuni Baru
         </h2>
     </x-slot>
@@ -104,7 +104,7 @@
                                     value="{{ old('monthly_price') }}"
                                     class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700"
                                     min="0">
-                                <p class="text-gray-600 text-xs mt-1">Otomatis terisi dari harga kamar</p>
+                                <p class="text-gray-600 text-xs mt-1">Otomatis occupied dari harga kamar</p>
                             </div>
                         </div>
                     </div>

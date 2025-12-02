@@ -38,8 +38,8 @@ class FinanceController extends Controller
             ->with('category')
             ->get();
 
-        $incomeCategories = $incomes->groupBy('category.name')->map->sum('amount');
-        $expenseCategories = $expenses->groupBy('category.name')->map->sum('amount');
+        $incomeCategories = $incomes->groupBy('category.name')->map->sum('amount')->toArray();
+        $expenseCategories = $expenses->groupBy('category.name')->map->sum('amount')->toArray();
 
         $roi = app(\App\Services\CostService::class)
             ->calculateROI($tenantId, $month->startOfMonth(), $month->endOfMonth());

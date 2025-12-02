@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             Laporan Keuangan
         </h2>
     </x-slot>
@@ -40,7 +40,8 @@
                 </div>
                 <div class="bg-blue-50 overflow-hidden shadow-sm sm:rounded-lg p-6">
                     <p class="text-sm text-gray-600 mb-2">Laba Bersih</p>
-                    {{-- <p class="text-2xl font-bold text-blue-600">Rp {{ number_format($summary['net_profit'], 0, ',', '.') }}</p> --}}
+                    <p class="text-2xl font-bold text-blue-600">Rp
+                        {{ number_format($summary['net_cashflow'], 0, ',', '.') }}</p>
                 </div>
                 <div class="bg-purple-50 overflow-hidden shadow-sm sm:rounded-lg p-6">
                     <p class="text-sm text-gray-600 mb-2">ROI</p>
@@ -95,9 +96,9 @@
         new Chart(document.getElementById('incomeChart'), {
             type: 'pie',
             data: {
-                labels: {!! json_encode($incomeCategories->pluck('name')) !!},
+                labels: {!! json_encode(array_keys($incomeCategories)) !!},
                 datasets: [{
-                    data: {!! json_encode($incomeCategories->pluck('total')) !!},
+                    data: {!! json_encode(array_values($incomeCategories)) !!},
                     backgroundColor: ['#10b981', '#3b82f6', '#8b5cf6', '#f59e0b', '#ef4444']
                 }]
             }
@@ -107,9 +108,9 @@
         new Chart(document.getElementById('expenseChart'), {
             type: 'pie',
             data: {
-                labels: {!! json_encode($expenseCategories->pluck('name')) !!},
+                labels: {!! json_encode(array_keys($expenseCategories)) !!},
                 datasets: [{
-                    data: {!! json_encode($expenseCategories->pluck('total')) !!},
+                    data: {!! json_encode(array_values($expenseCategories)) !!},
                     backgroundColor: ['#ef4444', '#f59e0b', '#8b5cf6', '#3b82f6', '#10b981']
                 }]
             }
