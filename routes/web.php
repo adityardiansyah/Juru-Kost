@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Web\OrderController;
 use App\Http\Controllers\Web\TenantController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoomTypeController;
@@ -23,9 +24,11 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Route::get('/dashboard', function () {
-//     return view('dashboard');
-// })->middleware(['auth', 'verified'])->name('dashboard');
+// Order routes (public)
+Route::get('/order', [OrderController::class, 'index'])->name('order.index');
+Route::post('/order', [OrderController::class, 'store'])->name('order.store');
+Route::get('/order/success/{order}', [OrderController::class, 'success'])->name('order.success');
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -113,6 +116,13 @@ Route::middleware(['auth', 'tenant.set'])->group(function () {
             Route::get('/export', [FinanceController::class, 'export'])->name('export');
         });
 
+        // Debt Management
+        Route::resource('debts', \App\Http\Controllers\Web\DebtController::class);
+        Route::post('debts/{debt}/payments', [\App\Http\Controllers\Web\DebtPaymentController::class, 'store'])
+            ->name('debts.payments.store');
+        Route::delete('debt-payments/{payment}', [\App\Http\Controllers\Web\DebtPaymentController::class, 'destroy'])
+            ->name('debt-payments.destroy');
+
         // Assets
         Route::resource('assets', AssetController::class);
         Route::post('assets/{asset}/maintenance', [AssetController::class, 'addMaintenance'])
@@ -128,21 +138,21 @@ Route::middleware(['auth', 'tenant.set'])->group(function () {
             ->name('inventories.stock-out');
 
         // Maintenance Requests
-        Route::resource('maintenance-requests', MaintenanceRequestController::class);
-        Route::post(
-            'maintenance-requests/{maintenanceRequest}/update-status',
-            [MaintenanceRequestController::class, 'updateStatus']
-        )
-            ->name('maintenance-requests.update-status');
+        // Route::resource('maintenance-requests', MaintenanceRequestController::class);
+        // Route::post(
+        //     'maintenance-requests/{maintenanceRequest}/update-status',
+        //     [MaintenanceRequestController::class, 'updateStatus']
+        // )
+        //     ->name('maintenance-requests.update-status');
 
         // Reports
-        Route::prefix('reports')->name('reports.')->group(function () {
-            Route::get('/', [ReportController::class, 'index'])->name('index');
-            Route::get('/occupancy', [ReportController::class, 'occupancy'])->name('occupancy');
-            Route::get('/revenue', [ReportController::class, 'revenue'])->name('revenue');
-            Route::get('/expenses', [ReportController::class, 'expenses'])->name('expenses');
-            Route::get('/unpaid-bills', [ReportController::class, 'unpaidBills'])->name('unpaid-bills');
-            Route::get('/assets', [ReportController::class, 'assets'])->name('assets');
-        });
+        // Route::prefix('reports')->name('reports.')->group(function () {
+        //     Route::get('/', [ReportController::class, 'index'])->name('index');
+        //     Route::get('/occupancy', [ReportController::class, 'occupancy'])->name('occupancy');
+        //     Route::get('/revenue', [ReportController::class, 'revenue'])->name('revenue');
+        //     Route::get('/expenses', [ReportController::class, 'expenses'])->name('expenses');
+        //     Route::get('/unpaid-bills', [ReportController::class, 'unpaidBills'])->name('unpaid-bills');
+        //     Route::get('/assets', [ReportController::class, 'assets'])->name('assets');
+        // });
     });
 });

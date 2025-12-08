@@ -82,6 +82,20 @@ class MenuSeeder extends Seeder
         ]);
 
         Menu::create([
+            'name' => 'Hutang',
+            'route_name' => 'finance.debts.index',
+            'parent_id' => $keuangan->id,
+            'order' => 4,
+        ]);
+
+        Menu::create([
+            'name' => 'Piutang',
+            'route_name' => 'finance.debts.index',
+            'parent_id' => $keuangan->id,
+            'order' => 5,
+        ]);
+
+        Menu::create([
             'name' => 'Kategori Pemasukan',
             'route_name' => 'finance.income-categories.index',
             'parent_id' => $keuangan->id,

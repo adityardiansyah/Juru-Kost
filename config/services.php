@@ -34,6 +34,12 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+
+    'recaptcha' => [
+        'site_key' => env('RECAPTCHA_SITE_KEY', ''),
+        'secret_key' => env('RECAPTCHA_SECRET_KEY', ''),
+    ],
+
     'whatsapp' => [
         'url' => env('WHATSAPP_API_URL', 'https://api.fonnte.com/send'),
         'key' => env('WHATSAPP_API_KEY', ''),

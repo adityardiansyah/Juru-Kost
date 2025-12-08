@@ -18,7 +18,14 @@ class TenantController extends Controller
             abort(403, 'Unauthorized access to this tenant');
         }
 
-        $tenant->load('users');
+        $tenant->load(['users' => function ($query) {
+            $query->withPivot('role_id');
+        }]);
+
+        // Add role information to each user
+        $tenant->users->each(function ($user) {
+            $user->role = \App\Models\Role::find($user->pivot->role_id);
+        });
 
         // Get statistics
         $stats = [
@@ -34,9 +41,10 @@ class TenantController extends Controller
     public function edit(Tenant $tenant)
     {
         // Verify user is owner
+        $ownerRole = \App\Models\Role::where('name', 'owner')->first();
         $isOwner = auth()->user()->tenants()
             ->wherePivot('tenant_id', $tenant->id)
-            ->wherePivot('role', 'owner')
+            ->wherePivot('role_id', $ownerRole->id)
             ->exists();
 
         if (!$isOwner) {
@@ -49,9 +57,10 @@ class TenantController extends Controller
     public function update(Request $request, Tenant $tenant)
     {
         // Verify user is owner
+        $ownerRole = \App\Models\Role::where('name', 'owner')->first();
         $isOwner = auth()->user()->tenants()
             ->wherePivot('tenant_id', $tenant->id)
-            ->wherePivot('role', 'owner')
+            ->wherePivot('role_id', $ownerRole->id)
             ->exists();
 
         if (!$isOwner) {

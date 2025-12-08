@@ -146,12 +146,12 @@
                 labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
                 datasets: [{
                     label: 'Pendapatan',
-                    data: [18000000, 19000000, 17500000, 20000000, 21000000, 18000000],
+                    data: [],
                     borderColor: 'rgb(34, 197, 94)',
                     backgroundColor: 'rgba(34, 197, 94, 0.1)',
                 }, {
                     label: 'Pengeluaran',
-                    data: [5000000, 5500000, 4800000, 6000000, 5200000, 5000000],
+                    data: [],
                     borderColor: 'rgb(239, 68, 68)',
                     backgroundColor: 'rgba(239, 68, 68, 0.1)',
                 }]
@@ -167,7 +167,7 @@
         new Chart(roomCtx, {
             type: 'doughnut',
             data: {
-                labels: ['occupied', 'Kosong', 'Maintenance'],
+                labels: ['Terisi', 'Kosong', 'Maintenance'],
                 datasets: [{
                     data: [{{ $statistics['occupied_rooms'] }}, {{ $statistics['available_rooms'] }}, 0],
                     backgroundColor: ['rgb(34, 197, 94)', 'rgb(59, 130, 246)', 'rgb(234, 179, 8)'],

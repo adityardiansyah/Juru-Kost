@@ -37,6 +37,15 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
+    /**
+     * Get the role for a specific tenant
+     */
+    public function roleInTenant($tenantId): ?Role
+    {
+        $tenant = $this->tenants()->where('tenants.id', $tenantId)->first();
+        return $tenant ? Role::find($tenant->pivot->role_id) : null;
+    }
+
     public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class, 'tenant_user')

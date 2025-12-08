@@ -12,6 +12,12 @@ class TenantSelectionController extends Controller
     {
         $tenants = auth()->user()->tenants()->with('users')->get();
 
+        // Add role information to each tenant
+        $tenants->each(function ($tenant) {
+            $roleId = $tenant->pivot->role_id;
+            $tenant->role = \App\Models\Role::find($roleId);
+        });
+
         // If user only has one tenant, auto-select it
         if ($tenants->count() === 1) {
             session(['tenant_id' => $tenants->first()->id]);
@@ -77,7 +83,8 @@ class TenantSelectionController extends Controller
         $tenant = Tenant::create($validated);
 
         // Attach current user as owner
-        $tenant->users()->attach(auth()->id(), ['role' => 'owner']);
+        $ownerRole = \App\Models\Role::where('name', 'owner')->first();
+        $tenant->users()->attach(auth()->id(), ['role_id' => $ownerRole->id]);
 
         // Auto-select the new tenant
         session(['tenant_id' => $tenant->id]);
@@ -97,12 +104,16 @@ class TenantSelectionController extends Controller
             return response()->json(['role' => null]);
         }
 
-        $role = auth()->user()->tenants()
+        $tenant = auth()->user()->tenants()
             ->where('tenants.id', $tenantId)
-            ->first()
-            ->pivot
-            ->role ?? null;
+            ->first();
 
-        return response()->json(['role' => $role]);
+        if (!$tenant) {
+            return response()->json(['role' => null]);
+        }
+
+        $role = \App\Models\Role::find($tenant->pivot->role_id);
+
+        return response()->json(['role' => $role ? $role->name : null]);
     }
 }
