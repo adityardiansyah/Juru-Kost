@@ -42,6 +42,11 @@ Route::middleware('auth')->group(function () {
         Route::resource('menus', MenuController::class);
         Route::get('menus/{menu}/assign-roles', [MenuController::class, 'assignRoles'])->name('menus.assign-roles');
         Route::post('menus/{menu}/assign-roles', [MenuController::class, 'updateRoles'])->name('menus.update-roles');
+
+        // Package Management
+        Route::resource('packages', \App\Http\Controllers\Admin\PackageController::class);
+        Route::post('packages/{package}/toggle-status', [\App\Http\Controllers\Admin\PackageController::class, 'toggleStatus'])
+            ->name('packages.toggle-status');
     });
 });
 
