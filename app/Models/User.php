@@ -92,4 +92,18 @@ class User extends Authenticatable
     {
         return $this->hasRole('owner', $tenantId);
     }
+
+    /**
+     * Get the current active tenant from session
+     */
+    public function getCurrentTenantAttribute(): ?Tenant
+    {
+        $tenantId = session('tenant_id');
+
+        if (!$tenantId) {
+            return null;
+        }
+
+        return $this->tenants()->find($tenantId);
+    }
 }

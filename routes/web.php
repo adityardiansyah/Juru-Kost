@@ -24,6 +24,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Public Tenant Landing Page
+Route::get('/kost/{tenant:slug}', [App\Http\Controllers\Web\TenantLandingController::class, 'show'])->name('tenant.landing');
+
 // Order routes (public)
 Route::get('/order', [OrderController::class, 'index'])->name('order.index');
 Route::post('/order', [OrderController::class, 'store'])->name('order.store');
@@ -48,12 +51,6 @@ Route::middleware('auth')->group(function () {
         Route::post('packages/{package}/toggle-status', [\App\Http\Controllers\Admin\PackageController::class, 'toggleStatus'])
             ->name('packages.toggle-status');
     });
-});
-
-Route::middleware('tenant.ensure')->group(function () {
-    // Route::get('/tenant/{tenant}', [TenantController::class, 'show'])->name('tenant.show');
-    // Route::get('/tenant/{tenant}/edit', [TenantController::class, 'edit'])->name('tenant.edit');
-    // Route::put('/tenant/{tenant}', [TenantController::class, 'update'])->name('tenant.update');
 });
 
 require __DIR__ . '/auth.php';
@@ -141,6 +138,16 @@ Route::middleware(['auth', 'tenant.set'])->group(function () {
             ->name('inventories.stock-in');
         Route::post('inventories/{inventory}/stock-out', [InventoryController::class, 'stockOut'])
             ->name('inventories.stock-out');
+
+        // Tenant Settings - FAQ & Testimonials
+        Route::resource('tenant-faqs', \App\Http\Controllers\Web\TenantFaqController::class);
+        Route::post('tenant-faqs/reorder', [\App\Http\Controllers\Web\TenantFaqController::class, 'reorder'])
+            ->name('tenant-faqs.reorder');
+
+        Route::resource('tenant-testimonials', \App\Http\Controllers\Web\TenantTestimonialController::class);
+
+        Route::put('tenant/location', [TenantController::class, 'updateLocation'])
+            ->name('tenant.update-location');
 
         // Maintenance Requests
         // Route::resource('maintenance-requests', MaintenanceRequestController::class);

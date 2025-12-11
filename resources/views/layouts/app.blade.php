@@ -80,18 +80,22 @@ $watch('sidebarOpen', val => localStorage.setItem('sidebarOpen', val))"
                                     </div>
 
                                     @foreach (auth()->user()->tenants as $tenant)
-                                        <x-dropdown-link :href="route('tenant.switch', $tenant->id)" class="flex items-center">
-                                            @if ($tenant->id == session('tenant_id'))
-                                                <svg class="mr-2 h-4 w-4 text-green-500" fill="none"
-                                                    stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path d="M5 13l4 4L19 7"></path>
-                                                </svg>
-                                            @else
-                                                <span class="w-6"></span>
-                                            @endif
-                                            {{ $tenant->name }}
-                                        </x-dropdown-link>
+                                        <form method="POST" action="{{ route('tenant.switch', $tenant->id) }}">
+                                            @csrf
+                                            <button type="submit"
+                                                class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
+                                                @if ($tenant->id == session('tenant_id'))
+                                                    <svg class="mr-2 h-4 w-4 text-green-500" fill="none"
+                                                        stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path d="M5 13l4 4L19 7"></path>
+                                                    </svg>
+                                                @else
+                                                    <span class="w-6"></span>
+                                                @endif
+                                                {{ $tenant->name }}
+                                            </button>
+                                        </form>
                                     @endforeach
 
                                     <div class="border-t border-gray-100 dark:border-gray-600"></div>
@@ -264,6 +268,8 @@ $watch('sidebarOpen', val => localStorage.setItem('sidebarOpen', val))"
             </main>
         </div>
     </div>
+
+    @stack('scripts')
 </body>
 
 </html>

@@ -16,6 +16,8 @@ class Tenant extends Model
         'slug',
         'description',
         'address',
+        'latitude',
+        'longitude',
         'phone',
         'email',
         'settings',
@@ -67,5 +69,15 @@ class Tenant extends Model
     public function inventories(): HasMany
     {
         return $this->hasMany(Inventory::class);
+    }
+
+    public function faqs(): HasMany
+    {
+        return $this->hasMany(TenantFaq::class);
+    }
+
+    public function testimonials(): HasMany
+    {
+        return $this->hasMany(TenantTestimonial::class);
     }
 }
